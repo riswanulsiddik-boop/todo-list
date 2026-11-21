@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      padding-top: 60px;
+    }
+
+    .container {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 12px;
+    }
+
+    .header h2 {
+      color: #333;
+    }
+
+    .add-popup-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .add-popup-btn:hover {
+      background-color: #45a049;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      background: #f9fafb;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .delete-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .delete-btn:hover {
+      background-color: #e60000;
+    }
+
+    /* Popup Overlay & Box */
+    .overlay {
+      background-color: black;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      opacity: 0.7;
+      z-index: 1;
+      display: none;
+    }
+
+    .popupbox {
+      position: fixed;
+      z-index: 2;
+      background-color: white;
+      color: black;
+      width: 90%;
+      max-width: 400px;
+      padding: 25px;
+      border-radius: 12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .popupbox h3 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .popupbox input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .popup-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .save-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .close-btn {
+      background-color: #888;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Todo Container -->
+  <div class="container">
+    <div class="header">
+      <h2>My Todo List</h2>
+      <button id="open-popup-btn" class="add-popup-btn">+ Add Task</button>
+    </div>
+
+    <ul id="list-container">
+      <li>
+        <span>Learn JavaScript DOM</span>
+        <button class="delete-btn" onclick="deleteItem(event)">Delete</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Popup Overlay & Box -->
+  <div class="overlay" id="overlay"></div>
+
+  <div class="popupbox" id="popupbox">
+    <h3>Add New Task</h3>
+    <input type="text" id="task-input" placeholder="Enter your task here...">
+    <div class="popup-actions">
+      <button id="close-popup-btn" class="close-btn">Cancel</button>
+      <button id="add-task-btn" class="save-btn">Add</button>
+    </div>
+  </div>
+
+  <script>
+    // Selecting Elements
+    var overlay = document.getElementById("overlay");
+    var popupbox = document.getElementById("popupbox");
+    var openPopupBtn = document.getElementById("open-popup-btn");
+    var closePopupBtn = document.getElementById("close-popup-btn");
+    var addTaskBtn = document.getElementById("add-task-btn");
+    var taskInput = document.getElementById("task-input");
+    var ul = document.getElementById("list-container");
+
+    // Event Listener: Open Popup
+    openPopupBtn.addEventListener("click", function() {
+      popupbox.style.display = "block";
+      overlay.style.display = "block";
+      taskInput.focus();
+    });
+
+    // Event Listener: Close Popup
+    closePopupBtn.addEventListener("click", function() {
+      popupbox.style.display = "none";
+      overlay.style.display = "none";
+      taskInput.value = "";
+    });
+
+    // Event Listener: Add Task
+    addTaskBtn.addEventListener("click", function() {
+      var taskText = taskInput.value.trim();
+      if (taskText === "") {
+        alert("Please enter a task!");
+        return;
+      }
+
+      var listitem = document.createElement("li");
+      listitem.innerHTML = "<span>" + taskText + "</span> <button class='delete-btn' onclick='deleteItem(event)'>Delete</button>";
+      ul.append(listitem);
+
+      // Clear & Close Popup
+      taskInput.value = "";
+      popupbox.style.display = "none";
+      overlay.style.display = "none";
+    });
+
+    // Delete Task Function
+    function deleteItem(event) {
+      event.target.parentElement.remove();
+    }
+  </script>
+
+</body>
+</html>
